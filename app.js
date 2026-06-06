@@ -1,9 +1,11 @@
 const express = require('express');
-require('dotenv').config();
-
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const connectDB = require('./src/config/db');
 const authRoutes = require('./src/routes/auth.routes');
 const newsRoutes = require('./src/routes/news.routes');
+// 1. Import your preferences routes here
+const preferenceRoutes = require('./src/routes/preferences.routes'); 
 
 const app = express();
 app.use(express.json());
@@ -13,8 +15,14 @@ connectDB();
 
 // Mount system routes under the /api path namespace
 app.use('/api', authRoutes);
+
+// 2. CRITICAL FIX: Mount the news routes so /api/news works!
 app.use('/api', newsRoutes);
 
+// 3. CRITICAL FIX: Mount the preferences routes so /api/preferences works!
+app.use('/api', preferenceRoutes);
+
+// Wildcard fallback for unmatched routes
 app.use((req, res) => {
     res.status(404).json({ message: "Resource route not found." });
 });

@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
+const { json } = require('express/lib/response');
 
 exports.register = async (req, res) => {
     try {
@@ -40,9 +41,14 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: "Invalid email or password." });
         }
 
-        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign(
+            { id: user._id }, 
+            process.env.JWT_SECRET || 'your_super_secret_jwt_key_here', 
+            { expiresIn: '1h' }
+        );
         res.status(200).json({ message: "Login successful", token });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: "Error logging in." });
     }
 };
